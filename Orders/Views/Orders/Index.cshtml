@@ -1,0 +1,94 @@
+﻿@model IEnumerable<Orders.Models.Order>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.AddressFrom)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AddressTo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Phone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cancelled)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AddressFrom)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AddressTo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Phone)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @if (item.Cancelled)
+                    {
+                        <text>V</text>
+                    }
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("Edit", "Orders", new { id = item.Id })'">
+                        Edit</button>
+                    @if (!item.Cancelled)
+                    {
+                        <button type="button" class="cancel-btn btn btn-danger" data-id="@item.Id">Cancel</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts {
+
+    <script>
+        $(function () {
+            $('.cancel-btn').click(function () {
+                var $city = $(this);
+                var id = ($city.data('id')).toString();
+                var url = "/orders/cancel"
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: id,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    success: function (data) {
+                        location.reload();
+                    },
+                    error: function (data) {
+                        console.log('something went wrong with cancel request');
+                    }
+                });
+            });
+        });
+    </script>
+
+}
