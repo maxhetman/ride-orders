@@ -13,6 +13,9 @@
     <thead>
         <tr>
             <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.AddressFrom)
             </th>
             <th>
@@ -33,34 +36,38 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AddressFrom)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AddressTo)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Phone)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Price)
-                </td>
-                <td>
-                    @if (item.Cancelled)
-                    {
-                        <text>V</text>
-                    }
-                </td>
-                <td>
-                    <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("Edit", "Orders", new { id = item.Id })'">
-                        Edit</button>
-                    @if (!item.Cancelled)
-                    {
-                        <button type="button" class="cancel-btn btn btn-danger" data-id="@item.Id">Cancel</button>
-                    }
-                </td>
-            </tr>
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AddressFrom)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AddressTo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Phone)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @if (item.Cancelled)
+                {
+                    <text>V</text>
+                }
+            </td>
+            <td>
+                <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("Edit", "Orders", new { id = item.Id })'">
+                    Edit
+                </button>
+                @if (!item.Cancelled)
+                {
+                    <button type="button" class="cancel-btn btn btn-danger" data-id="@item.Id">Cancel</button>
+                }
+            </td>
+        </tr>
         }
     </tbody>
 </table>
@@ -69,10 +76,15 @@
 
     <script>
         $(function () {
-            $('.cancel-btn').click(function () {
-                var $city = $(this);
-                var id = ($city.data('id')).toString();
+            $('.cancel-btn').on('click', function () {
+                var $cancelBtn = $(this);
+                var id = $cancelBtn.data('id').toString();
                 var url = "/orders/cancel"
+                var $editBtn = $cancelBtn.prev();
+
+                $editBtn.prop("disabled", true);
+                $cancelBtn.prop("disabled", true);
+
                 $.ajax({
                     type: "POST",
                     url: url,
@@ -81,10 +93,15 @@
                         'Content-Type': 'application/json'
                     },
                     success: function (data) {
-                        location.reload();
+                        $cancelBtn.parent().prev().html('V');
+                        $cancelBtn.remove();
                     },
                     error: function (data) {
                         console.log('something went wrong with cancel request');
+                        $cancelBtn.prop("disabled", false);
+                    },
+                    complete: function () {
+                        $editBtn.prop("disabled", false);
                     }
                 });
             });
